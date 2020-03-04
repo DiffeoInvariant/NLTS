@@ -108,12 +108,13 @@ namespace nlts
     }
 
 
-    PetscErrorCode VecReadBinary(std::string filename, Vec x)
+    PetscErrorCode VecReadBinary(std::string filename, Vec *x)
     {
       PetscErrorCode ierr;
       PetscViewer    viewer;
+      ierr = VecCreate(PETSC_COMM_WORLD, x);CHKERRQ(ierr);
       ierr = PetscViewerBinaryOpen(PETSC_COMM_WORLD, filename.c_str(), FILE_MODE_READ, &viewer);CHKERRQ(ierr);
-      ierr = VecView(x, viewer);CHKERRQ(ierr);
+      ierr = VecLoad(*x, viewer);CHKERRQ(ierr);
       ierr = PetscViewerDestroy(&viewer);CHKERRQ(ierr);
       return 0;
     }
