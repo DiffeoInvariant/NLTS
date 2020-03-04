@@ -17,6 +17,8 @@ namespace nlts
 
     PetscErrorCode VecReadScalarTrajectory(std::string, Vec *, Vec *);
 
+    PetscErrorCode VecReadBinary(std::string, Vec);
+
     PetscErrorCode VecWriteScalarTrajectory(std::string filename_pre, Vec X, Vec T, bool make_new_directory=true);
     
   }

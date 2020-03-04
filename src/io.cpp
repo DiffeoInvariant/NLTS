@@ -30,16 +30,16 @@ namespace nlts
       MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
       MPI_Comm_size(PETSC_COMM_WORLD, &size);
 
-      if(size > 1){
-	PetscPrintf(PETSC_COMM_WORLD, "WARNING: creating vectors on all processes!.\n");
+      if(size > 1 and rank){
+	PetscPrintf(PETSC_COMM_WORLD, "WARNING: creating vectors on multiple processes or on a non-root process! This is probably not gonna work.\n");
       }
       
       auto [x, t] = read_scalar_trajectory(filename);
       idx.resize(x.size());
       std::iota(idx.begin(), idx.end(), 0);
       
-      ierr = VecCreateShared(PETSC_COMM_WORLD, x.size(), x.size(), X);CHKERRQ(ierr);
-      ierr = VecCreateShared(PETSC_COMM_WORLD, t.size(), t.size(), T);CHKERRQ(ierr);
+      ierr = VecCreateShared(PETSC_COMM_WORLD, PETSC_DECIDE, x.size(), X);CHKERRQ(ierr);
+      ierr = VecCreateShared(PETSC_COMM_WORLD, PETSC_DECIDE, t.size(), T);CHKERRQ(ierr);
       ierr = VecSetValues(*X, x.size(), idx.data(), x.data(), INSERT_VALUES);CHKERRQ(ierr);
       ierr = VecSetValues(*T, t.size(), idx.data(), t.data(), INSERT_VALUES);CHKERRQ(ierr);
       ierr = VecAssemblyBegin(*X);CHKERRQ(ierr);
@@ -105,6 +105,17 @@ namespace nlts
       ierr = PetscViewerDestroy(&viewer);CHKERRQ(ierr);
 
       PetscFunctionReturn(ierr);
+    }
+
+
+    PetscErrorCode VecReadBinary(std::string filename, Vec x)
+    {
+      PetscErrorCode ierr;
+      PetscViewer    viewer;
+      ierr = PetscViewerBinaryOpen(PETSC_COMM_WORLD, filename.c_str(), FILE_MODE_READ, &viewer);CHKERRQ(ierr);
+      ierr = VecView(x, viewer);CHKERRQ(ierr);
+      ierr = PetscViewerDestroy(&viewer);CHKERRQ(ierr);
+      return 0;
     }
 
   }
