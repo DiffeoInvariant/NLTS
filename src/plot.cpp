@@ -11,7 +11,9 @@ namespace nlts
 			  std::optional<std::string> ylabel,
 			  std::optional<int> xpixels,
 			  std::optional<int> ypixels,
-			  std::optional<int> hold_setting)
+			  std::optional<int> hold_setting,
+			  std::optional<std::pair<PetscReal, PetscReal>> xlims,
+			  std::optional<std::pair<PetscReal, PetscReal>> ylims)
   {
     PetscErrorCode ierr;
     PetscDraw      draw;
@@ -52,7 +54,7 @@ namespace nlts
     if(hold_setting){
       hold = *hold_setting;
     } else {
-      hold = -1;
+      hold = -2;
     }
       
     ierr = VecGetLocalSize(X, &nx);CHKERRQ(ierr);
@@ -60,6 +62,7 @@ namespace nlts
     n = std::min(nx, ny);
 
     ierr = PetscDrawCreate(PETSC_COMM_SELF, NULL, ttl, 0, 0, width, height, &draw);CHKERRQ(ierr);
+    ierr = PetscDrawPointSetSize(draw, 0.0);CHKERRQ(ierr);
     ierr = PetscDrawSetFromOptions(draw);CHKERRQ(ierr);
     ierr = PetscDrawSPCreate(draw, 1, &scatter);CHKERRQ(ierr);
     if(xlab or ylab){
@@ -71,6 +74,12 @@ namespace nlts
     ierr = VecGetArray(Y, &y);CHKERRQ(ierr);
     for(i = 0; i < n; ++i){
       ierr = PetscDrawSPAddPoint(scatter, &x[i], &y[i]);CHKERRQ(ierr);
+      /*ierr = PetscDrawSPDraw(scatter, PETSC_FALSE);CHKERRQ(ierr);*/
+    }
+    ierr = PetscDrawSPDraw(scatter, PETSC_FALSE);CHKERRQ(ierr);
+    if(xlims and ylims){
+      ierr = PetscDrawSPSetLimits(scatter, xlims->first, xlims->second,
+				  ylims->first, ylims->second);CHKERRQ(ierr);
     }
     ierr = VecRestoreArray(X, &x);CHKERRQ(ierr);
     ierr = VecRestoreArray(Y, &y);CHKERRQ(ierr);

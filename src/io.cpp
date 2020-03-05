@@ -38,15 +38,14 @@ namespace nlts
       idx.resize(x.size());
       std::iota(idx.begin(), idx.end(), 0);
       
-      ierr = VecCreateShared(PETSC_COMM_WORLD, PETSC_DECIDE, x.size(), X);CHKERRQ(ierr);
-      ierr = VecCreateShared(PETSC_COMM_WORLD, PETSC_DECIDE, t.size(), T);CHKERRQ(ierr);
+      ierr = VecCreateMPI(PETSC_COMM_WORLD, PETSC_DECIDE, x.size(), X);CHKERRQ(ierr);
+      ierr = VecCreateMPI(PETSC_COMM_WORLD, PETSC_DECIDE, t.size(), T);CHKERRQ(ierr);
       ierr = VecSetValues(*X, x.size(), idx.data(), x.data(), INSERT_VALUES);CHKERRQ(ierr);
       ierr = VecSetValues(*T, t.size(), idx.data(), t.data(), INSERT_VALUES);CHKERRQ(ierr);
       ierr = VecAssemblyBegin(*X);CHKERRQ(ierr);
       ierr = VecAssemblyEnd(*X);CHKERRQ(ierr);
       ierr = VecAssemblyBegin(*T);CHKERRQ(ierr);
       ierr = VecAssemblyEnd(*T);CHKERRQ(ierr);
-    
 
       return 0;
     }

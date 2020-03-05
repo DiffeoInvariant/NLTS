@@ -100,53 +100,54 @@ namespace nlts
 				  StencilType direction, bool periodic_domain)
   {
     PetscErrorCode ierr;
-    PetscInt       i, nx, nxp;
+    PetscInt       i, nx, xs, xe, xps, xpe;
     const PetscScalar *x;
     PetscScalar       *dxdt;
 
     PetscFunctionBeginUser;
-    ierr = VecGetLocalSize(X, &nx);CHKERRQ(ierr);
-    ierr = VecGetLocalSize(dXdt, &nxp);CHKERRQ(ierr);
-    if(nx != nxp){
-      SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_SIZ, "Must pass X and dXdt Vecs with the same local sizes!");
+    ierr = VecGetOwnershipRange(X, &xs, &xe);CHKERRQ(ierr);
+    ierr = VecGetOwnershipRange(dXdt, &xps, &xpe);CHKERRQ(ierr);
+    if(xs != xps or xe != xpe){
+      SETERRQ4(PETSC_COMM_WORLD, PETSC_ERR_ARG_SIZ, "Must pass X and dXdt Vecs with the same local sizes! X has local ownwership range [%d, %d], but dXdt has range [%d, %d].\n", xs, xe, xps, xpe);
     }
+    nx = xe - xs;
     if(nx < 2 * order){
-      SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_SIZ, "Must pass array of length at least twice the finite difference order!");
+      SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_SIZ, "Must pass array of (local) length at least twice the finite difference order!");
     }
 
     ierr = VecGetArrayRead(X, &x);CHKERRQ(ierr);
     ierr = VecGetArray(dXdt, &dxdt);CHKERRQ(ierr);
 
-    for(i=0; i < nx; ++i){
+    for(i=xs; i < xe; ++i){
       switch(direction){
       case Forward:
 	{
-	  if(i < nx - order){
-	    ierr = ForwardFd(x, dxdt, i, dt, order);CHKERRQ(ierr);
+	  if(i - xs < nx - order){
+	    ierr = ForwardFd(x, dxdt, i - xs, dt, order);CHKERRQ(ierr);
 	  } else {
 	    /* near end of the array, use backward FD */
-	    ierr = BackwardFd(x, dxdt, i, dt, order);CHKERRQ(ierr);
+	    ierr = BackwardFd(x, dxdt, i - xs, dt, order);CHKERRQ(ierr);
 	  }
 	  break;
 	}/*end case Forward*/
       case Backward:
 	{
-	  if(i >= order){
-	    ierr = BackwardFd(x, dxdt, i, dt, order);CHKERRQ(ierr);
+	  if(i - xs >= order){
+	    ierr = BackwardFd(x, dxdt, i - xs, dt, order);CHKERRQ(ierr);
 	  } else {
 	    /* near start of array, use forward FD */
-	    ierr = ForwardFd(x, dxdt, i, dt, order);CHKERRQ(ierr);
+	    ierr = ForwardFd(x, dxdt, i - xs, dt, order);CHKERRQ(ierr);
 	  }
 	  break;
 	}
       case Central:
 	{
-	  if(i >= order/2 and i < nx - order/2){
-	    ierr = CentralFd(x, dxdt, i, dt, order);CHKERRQ(ierr);
+	  if(i - xs >= order/2 and i - xs < nx - order/2){
+	    ierr = CentralFd(x, dxdt, i - xs, dt, order);CHKERRQ(ierr);
 	  } else if(i < order / 2){
-	    ierr = ForwardFd(x, dxdt, i, dt, std::min(6, order));CHKERRQ(ierr);
+	    ierr = ForwardFd(x, dxdt, i - xs, dt, std::min(6, order));CHKERRQ(ierr);
 	  } else {
-	    ierr = BackwardFd(x, dxdt, i, dt, std::min(6, order));CHKERRQ(ierr);
+	    ierr = BackwardFd(x, dxdt, i - xs, dt, std::min(6, order));CHKERRQ(ierr);
 	  }
 	  break;
 	}

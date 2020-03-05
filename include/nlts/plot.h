@@ -4,6 +4,7 @@
 #include <petscvec.h>
 #include <optional>
 #include <string>
+#include <utility>
 
 
 namespace nlts
@@ -15,7 +16,9 @@ namespace nlts
 			  std::optional<std::string> ylabel=std::nullopt,
 			  std::optional<int> xpixels=std::nullopt,
 			  std::optional<int> ypixels=std::nullopt,
-			  std::optional<int> hold_setting=std::nullopt);
+			  std::optional<int> hold_setting=std::nullopt,
+			  std::optional<std::pair<PetscReal, PetscReal>> xlims=std::nullopt,
+			  std::optional<std::pair<PetscReal, PetscReal>> ylims=std::nullopt);
 
 }
 #endif
