@@ -17,6 +17,7 @@ namespace nlts
 			  std::optional<int> xpixels=std::nullopt,
 			  std::optional<int> ypixels=std::nullopt,
 			  std::optional<int> hold_setting=std::nullopt,
+			  std::optional<std::string> save_file=std::nullopt,
 			  std::optional<std::pair<PetscReal, PetscReal>> xlims=std::nullopt,
 			  std::optional<std::pair<PetscReal, PetscReal>> ylims=std::nullopt);
 

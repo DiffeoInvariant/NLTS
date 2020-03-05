@@ -12,6 +12,7 @@ namespace nlts
 			  std::optional<int> xpixels,
 			  std::optional<int> ypixels,
 			  std::optional<int> hold_setting,
+			  std::optional<std::string> save_file,
 			  std::optional<std::pair<PetscReal, PetscReal>> xlims,
 			  std::optional<std::pair<PetscReal, PetscReal>> ylims)
   {
@@ -62,6 +63,9 @@ namespace nlts
     n = std::min(nx, ny);
 
     ierr = PetscDrawCreate(PETSC_COMM_SELF, NULL, ttl, 0, 0, width, height, &draw);CHKERRQ(ierr);
+    if(save_file){
+      ierr = PetscDrawSetSaveFinalImage(draw, save_file->c_str());CHKERRQ(ierr);
+    }
     ierr = PetscDrawPointSetSize(draw, 0.0);CHKERRQ(ierr);
     ierr = PetscDrawSetFromOptions(draw);CHKERRQ(ierr);
     ierr = PetscDrawSPCreate(draw, 1, &scatter);CHKERRQ(ierr);
@@ -83,7 +87,9 @@ namespace nlts
     }
     ierr = VecRestoreArray(X, &x);CHKERRQ(ierr);
     ierr = VecRestoreArray(Y, &y);CHKERRQ(ierr);
-
+    if(save_file){
+      ierr = PetscDrawSave(draw);CHKERRQ(ierr);
+    }
     ierr = PetscDrawSetPause(draw, hold);CHKERRQ(ierr);
     ierr = PetscDrawSPDestroy(&scatter);CHKERRQ(ierr);
     ierr = PetscDrawDestroy(&draw);CHKERRQ(ierr);

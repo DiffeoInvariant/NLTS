@@ -13,7 +13,7 @@ int main(int argc, char **argv)
   PetscBool flg;
   std::string xfile, tfile, data_dir, has_data_dir;
 
-  ierr = PetscInitialize(&argc, &argv, NULL, NULL);CHKERRQ(ierr);
+  ierr = nlts::Initialize(&argc, &argv);CHKERRQ(ierr);
 
   if(nlts::has_petsc_option("-data_dir")){
     std::tie(data_dir, has_data_dir) = nlts::get_petsc_option<std::string>("-data_dir");
@@ -67,6 +67,7 @@ int main(int argc, char **argv)
   nlts::TakensEmbedding embedder(X, t0, tf, dt, tau, m);
   ierr = embedder.embed();CHKERRQ(ierr);
 
+  PetscPrintf(PETSC_COMM_WORLD, "done embedding\n");
   std::string title{"Takens embedding with tau = "};
   title += std::to_string(tau);
   title += std::string{", m = "};

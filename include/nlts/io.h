@@ -21,9 +21,11 @@ namespace nlts
 
     PetscErrorCode VecWriteScalarTrajectory(std::string filename_pre, Vec X, Vec T, bool make_new_directory=true);
 
-    extern PetscErrorCode initialize(int *argc, char ***argv,
+    extern PetscErrorCode Initialize(int *argc, char ***argv,
 			    const char file[]=NULL,
 			    const char help[]=NULL);
+
+    extern PetscErrorCode Finalize();
 
     extern bool has_petsc_option(std::string name,
 				 std::optional<std::string> prepend=std::nullopt,

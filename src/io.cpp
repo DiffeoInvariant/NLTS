@@ -118,12 +118,20 @@ namespace nlts
       return 0;
     }
 
-    PetscErrorCode initialize(int *argc, char ***argv,
+    PetscErrorCode Initialize(int *argc, char ***argv,
 			      const char file[],
 			      const char help[])
     {
+      PetscFunctionBeginUser;
       auto ierr = PetscInitialize(argc, argv, file, help);CHKERRQ(ierr);
-      return ierr;
+      PetscFunctionReturn(ierr);
+    }
+
+    PetscErrorCode Finalize()
+    {
+      PetscFunctionBeginUser;
+      auto ierr = PetscFinalize();
+      PetscFunctionReturn(ierr);
     }
 
 

@@ -41,7 +41,7 @@ int main(int argc, char **argv)
   ierr = VecRestoreArray(dXdT, &x);CHKERRQ(ierr);
   
   ierr = nlts::PlotVecs(T, X, "x vs t", "t",
-			"x", 2500, 2500, std::nullopt,
+			"x", 2500, 2500, std::nullopt, "diff_plot.png",
 			std::make_pair(0.0, 45.0), std::make_pair(2.9,3.2));CHKERRQ(ierr);
 
   ierr = nlts::PlotVecs(T, dXdT, "dx/dt vs t", "t",
