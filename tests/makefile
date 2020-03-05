@@ -11,10 +11,15 @@ INCLS=-I$(NLTS_INCL) -I/usr/include/boost $(PETSC_CC_INCLUDES)
 
 TARGET_IO = test_io
 
-.PHONY: all io
+.PHONY: all io txt2petsc in diff embed
 
-all: io txt2petsc in
+all: io txt2petsc in diff embed
 
+embed: test_embedding.cpp
+	$(CXX) $(CXXFLAGS) $^ -o test_embed $(INCLS) $(LDFLAGS)
+
+diff: test_diff.cpp
+	$(CXX) $(CXXFLAGS) $^ -o test_diff $(INCLS) $(LDFLAGS)
 in: test_in.cpp
 	$(CXX) $(CXXFLAGS) $^ -o test_input $(INCLS) $(LDFLAGS)
 

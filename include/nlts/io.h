@@ -7,7 +7,7 @@
 #include <utility>
 #include <string>
 #include <vector>
-
+#include <optional>
 namespace nlts
 {
   inline namespace io
@@ -20,7 +20,19 @@ namespace nlts
     PetscErrorCode VecReadBinary(std::string, Vec *);
 
     PetscErrorCode VecWriteScalarTrajectory(std::string filename_pre, Vec X, Vec T, bool make_new_directory=true);
-    
+
+    extern PetscErrorCode initialize(int *argc, char ***argv,
+			    const char file[]=NULL,
+			    const char help[]=NULL);
+
+    extern bool has_petsc_option(std::string name,
+				 std::optional<std::string> prepend=std::nullopt,
+				 PetscOptions opts_db=NULL);
+
+    template<typename T>
+    extern std::pair<T, bool> get_petsc_option(std::string name,
+					       std::optional<std::string> prepend=std::nullopt,
+					       PetscOptions opts_db=NULL);
   }
 }
 #endif

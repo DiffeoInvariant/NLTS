@@ -51,7 +51,7 @@ namespace nlts
       }
       
       n = DataLength();
-      embedding.resize(n);
+      embedding.resize(m);
       AllocateEmbeddingVecs();
     };
 

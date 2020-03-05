@@ -118,5 +118,142 @@ namespace nlts
       return 0;
     }
 
+    PetscErrorCode initialize(int *argc, char ***argv,
+			      const char file[],
+			      const char help[])
+    {
+      auto ierr = PetscInitialize(argc, argv, file, help);CHKERRQ(ierr);
+      return ierr;
+    }
+
+
+    bool has_petsc_option(std::string name,
+			  std::optional<std::string> prepend,
+			  PetscOptions opts_db)
+    {
+      PetscBool has_opt;
+      if(prepend){
+	auto ierr = PetscOptionsHasName(opts_db, prepend->c_str(),
+					name.c_str(), &has_opt);CHKERRQ(ierr);
+      } else {
+	auto ierr = PetscOptionsHasName(opts_db, NULL,
+					name.c_str(), &has_opt);CHKERRQ(ierr);
+      }
+      return has_opt;
+    }
+
+  
+    template<>
+    std::pair<PetscReal, bool> get_petsc_option<PetscReal>(std::string name,
+							   std::optional<std::string> prepend,
+							   PetscOptions opts_db)
+    {
+      PetscBool has_opt;
+      PetscReal val=0;
+      if(prepend){
+	auto ierr = PetscOptionsGetReal(opts_db, prepend->c_str(),
+					name.c_str(), &val, &has_opt); 
+      } else {
+	auto ierr = PetscOptionsGetReal(opts_db, NULL,
+					name.c_str(), &val, &has_opt); 
+      }
+      
+      return {val, has_opt};
+    }
+
+    template<>
+    std::pair<PetscInt, bool> get_petsc_option<PetscInt>(std::string name,
+							 std::optional<std::string> prepend,
+							 PetscOptions opts_db)
+    {
+      PetscBool has_opt;
+      PetscInt val=0;
+      if(prepend){
+	auto ierr = PetscOptionsGetInt(opts_db, prepend->c_str(),
+				       name.c_str(), &val, &has_opt); 
+      } else {
+	auto ierr = PetscOptionsGetInt(opts_db, NULL,
+				       name.c_str(), &val, &has_opt); 
+      }
+      
+      return {val, has_opt};
+    }
+
+    template<>
+    std::pair<std::string, bool> get_petsc_option<std::string>(std::string name,
+							       std::optional<std::string> prepend,
+							       PetscOptions opts_db)
+    {
+      PetscBool has_opt;
+      char val[100];
+
+      if(prepend){
+	auto ierr = PetscOptionsGetString(opts_db, prepend->c_str(),
+					  name.c_str(), val, 100, &has_opt); 
+      } else {
+	auto ierr = PetscOptionsGetString(opts_db, NULL,
+					  name.c_str(), val, 100, &has_opt); 
+      }
+
+      return {std::string{val}, has_opt};
+
+    }
+
+
+#define PETRBF_MAX_OPT_ARR_LEN 10000
+    template<>
+    std::pair<std::vector<PetscInt>, bool>
+    get_petsc_option<std::vector<PetscInt>>(std::string name,
+					    std::optional<std::string> prepend,
+					    PetscOptions opts_db)
+    {
+      PetscBool has_opt;
+      PetscInt size = PETRBF_MAX_OPT_ARR_LEN;
+      PetscInt *vals;
+      if(prepend){
+	auto ierr = PetscOptionsGetIntArray(opts_db, prepend->c_str(), name.c_str(),
+					    vals, &size, &has_opt); 
+      } else {
+	auto ierr = PetscOptionsGetIntArray(opts_db, NULL, name.c_str(),
+					    vals, &size, &has_opt); 
+      }
+      
+      if(has_opt){
+	return std::make_pair(std::vector(vals, vals+size), true);
+      } else {
+	return std::make_pair(std::vector<PetscInt>(), false);
+      }
+    }
+
+    template<>
+    std::pair<std::vector<PetscReal>, bool>
+    get_petsc_option<std::vector<PetscReal>>(std::string name,
+					     std::optional<std::string> prepend,
+					     PetscOptions opts_db)
+    {
+      PetscBool has_opt;
+      PetscInt size = PETRBF_MAX_OPT_ARR_LEN;
+      PetscReal *vals;
+      if(prepend){
+	auto ierr = PetscOptionsGetRealArray(opts_db, prepend->c_str(), name.c_str(),
+					     vals, &size, &has_opt); 
+      } else {
+	auto ierr = PetscOptionsGetRealArray(opts_db, NULL, name.c_str(),
+					     vals, &size, &has_opt); 
+      }
+      if(has_opt){
+	auto retval = std::make_pair(std::vector(vals, vals+size), true);
+	if(vals){
+	  delete[] vals;
+	  vals = NULL;
+	}
+	return retval;
+      } else {
+	return std::make_pair(std::vector<PetscReal>(), false);
+      }
+  }
+
+    
+
   }
 }
