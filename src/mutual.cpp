@@ -3,10 +3,40 @@
 namespace nlts
 {
 
-  static PetscErrorCode PartitionArray(Vec X, PetscInt num_part, PetscInt& nx, std::vector<PetscInt>& arr)
+  static PetscErrorCode RescaleData(Vec X, PetscInt n, double& min, double& interval)
+  {
+    PetscInt i;
+    PetscScalar *x;
+    PetscErrorCode ierr;
+    PetscFunctionBeginUser;
+    ierr = VecGetArray(X, &x);CHKERRQ(ierr);
+    min = x[0];
+    interval = x[0];
+    for(i=0; i<n; ++i){
+      if(x[i] < min){
+	min = x[i];
+      }
+      if(x[i] > interval){
+	interval=x[i];
+      }
+    }
+    interval -= min;
+    if(interval == 0.0){
+      SETERRQ(PETSC_COMM_WORLD, 1, "Error, the data is constant! Cannot continue with Shannon entropy calculation.\n");
+    }
+    for(i=0; i<n; ++i){
+      x[i] = (x[i] - min)/interval;
+    }
+    ierr = VecRestoreArray(X, &x);CHKERRQ(ierr);
+    PetscFunctionReturn(ierr);
+  }
+      
+  
+  static PetscErrorCode PartitionArray(Vec X, PetscInt num_part, PetscInt& nx, std::vector<long>& arr)
   {
     PetscErrorCode ierr;
-    PetscInt       n, i;
+    PetscInt       n;
+    long           i;
     const PetscScalar *x;
     PetscFunctionBeginUser;
     ierr = VecGetLocalSize(X, &n);CHKERRQ(ierr);
@@ -15,7 +45,7 @@ namespace nlts
     ierr = VecGetArrayRead(X, &x);CHKERRQ(ierr);
     for(i=0; i < n; ++i){
       if(x[i] < 1.0){
-	arr[i] = (PetscInt)(x[i] * (PetscReal)num_part);
+	arr[i] = (long)(x[i] * (PetscReal)num_part);
       } else {
 	arr[i] = num_part - 1;
       }
@@ -40,14 +70,14 @@ namespace nlts
     return std::make_tuple(hx, hy, hxy);
   }
 
-  static PetscErrorCode ShannonEntropy(PetscInt idx, PetscInt num_part,
-				       const std::vector<PetscInt>& arr,
+  static PetscErrorCode ShannonEntropy(PetscInt idx, long num_part,
+				       const std::vector<long>& arr,
 				       std::vector<PetscInt>& hx,
 				       std::vector<PetscInt>& hy,
 				       std::vector<std::vector<PetscInt>>& hxy,
 				       PetscReal *H)
   {
-    PetscInt i, j, count=0;
+    long i, j, count=0;
     PetscReal shannon_norm, px, py, pxy=0.0;
     PetscFunctionBeginUser;
     for(i=0; i < num_part; ++i){
@@ -69,12 +99,14 @@ namespace nlts
     *H = 0.0;
     for(i=0; i < num_part; ++i){
       px = (PetscReal)(hx[i]) * shannon_norm;
-      for(j=0; j < num_part; ++j){
-	py = (PetscReal)(hy[j]) * shannon_norm;
-	if(py > 0.0){
-	  pxy = (PetscReal)(hxy[i][j]) * shannon_norm;
-	  if(pxy > 0.0){
-	    *H += pxy * PetscLogReal(pxy / (px * py));
+      if(px > 0.0){
+	for(j=0; j < num_part; ++j){
+	  py = (PetscReal)(hy[j]) * shannon_norm;
+	  if(py > 0.0){
+	    pxy = (PetscReal)(hxy[i][j]) * shannon_norm;
+	    if(pxy > 0.0){
+	      *H += pxy * PetscLogReal(pxy / (px * py));
+	    }
 	  }
 	}
       }
@@ -93,8 +125,9 @@ namespace nlts
 		    bool return_info)
   {
     PetscErrorCode ierr;
-    std::vector<PetscInt> arr;
+    std::vector<long> arr;
     PetscInt num_part, nx, tau, taumax;
+    PetscReal min, interval;
     std::vector<PetscReal> entropy;
     
     if(partition_boxes){
@@ -107,8 +140,11 @@ namespace nlts
     } else {
       taumax = 20;
     }
-    
+
+    ierr = VecGetLocalSize(X, &nx);
+    ierr = RescaleData(X, nx, min, interval);
     ierr = PartitionArray(X, num_part, nx, arr);
+    
     if(taumax >= nx){
       taumax = nx - 1;
     }
@@ -121,11 +157,11 @@ namespace nlts
     if(outfile){
       std::ofstream of(*outfile);
       auto precision = std::numeric_limits<double>::digits10;
-      of << std::setw(precision);
-      of << "Lag" << "Shannon_Entropy\n";
+      
+      of << "Lag " << "Shannon_Entropy\n";
       of << std::setprecision(precision);
       for(auto i=0; i<entropy.size(); ++i){
-	of << i << entropy[i] << '\n';
+	of << i << " " << entropy[i] << '\n';
       }
     }
       
