@@ -86,7 +86,7 @@ namespace nlts
   PetscErrorCode TakensEmbedding::embed()
   {
     int i, j;
-    PetscInt  nx, rank, xlow, xhigh;
+    PetscInt  nx, rank, xlow, xhigh, id;
     PetscReal t;
     const PetscScalar *x;
     PetscScalar *ex;
@@ -101,16 +101,18 @@ namespace nlts
 	SETERRQ2(PETSC_COMM_WORLD, 1, "Error, embedding Vec has larger local ownership range (%d elements) than data Vec (%d elements).", evlens[i], nx);
       }
       ierr = VecGetArray(embedding[i], &ex);CHKERRQ(ierr);
-      t = t0 + (PetscReal)xlow * dt;
+      t = t0;// + (PetscReal)xlow * dt;
       for(j=0; j < evlens[i]; ++j){
-	auto [id, is_exact_time] = IndexFromTime(t + (PetscReal)i * tau);
-	if(is_exact_time and id < n){
+	/*auto [id, is_exact_time] = IndexFromTime(t + (PetscReal)i * tau);*/
+	id = PetscInt((t + (PetscReal)i * tau)/dt);
+	if(/*is_exact_time and */id < n){
 	  ex[j] = x[id];
-	} else if(id >= nx){
+	} else/* if(id >= nx)*/{
 	  SETERRQ(PETSC_COMM_WORLD, 1, "Error, somehow index id in TakensEmbedding::embed is out of range.");
-	} else {
+	}/* else {
 	  PetscPrintf(PETSC_COMM_WORLD, "WARNING: interpolation currently not implemented. ignoring this index.");CHKERRQ(ierr);
-	}
+	  ex[j] = x[id];
+	}*/
 	t += dt;
       }
       ierr = VecRestoreArray(embedding[i], &ex);CHKERRQ(ierr);
