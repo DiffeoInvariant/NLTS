@@ -6,15 +6,11 @@ A C++ library for non-linear time series, built on PETSc.
 git clone git@github.com:DiffeoInvariant/NLTS.git
 ```
 ## Dependencies
-  You need working installations of PETSc and boost. 
+  You need working installations of PETSc (can be downloaded via `configure`) and boost. 
   You can download PETSc from https://www.mcs.anl.gov/petsc/download/index.html.
   
 ## Configuration
-  NLTS does not currently have a config file (coming soon!); you will have to edit
-  the makefile. Specifically, you will have to change `PETSC_DIR` and `PETSC_ARCH`
-  to the correct values (by default, `PETSC_DIR=/usr/local/petsc`, and `PETSC_ARCH=arch-linux-cxx-debug`),
-  and you may have to change the location of boost in the `INCLS` and `LDFLAGS` variables. Otherwise,
-  no changes or other configuration steps are necessary.
+  Run `./configure -h` to see configure options.
   
   
 ## Building
