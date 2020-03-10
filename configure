@@ -95,7 +95,7 @@ def build_makefile_lines(options):
              "include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables\n",
              "include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscrules\n\n",
              "NLTS_INCL=include/\n",
-             f"INCLS=-I$(NLTS_INCL) -I{options['boost_dir']} $(PETSC_CC_INCLUDES)\n",
+             f"INCLS=-I$(NLTS_INCL) -I{options['boost_dir']} -I./packages/GSL/include $(PETSC_CC_INCLUDES)\n",
              "NLTS_SRC_DIR=src/\n",
              "NLTS_SRCS:=$(shell find $(NLTS_SRC_DIR) -name '*.cpp')\n\n",
              "TARGET_DIR=lib\n",

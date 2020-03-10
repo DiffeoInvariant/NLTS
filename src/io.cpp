@@ -123,7 +123,7 @@ namespace nlts
 			      const char help[])
     {
       PetscFunctionBeginUser;
-      auto ierr = PetscInitialize(argc, argv, file, help);CHKERRQ(ierr);
+      PetscErrorCode ierr = PetscInitialize(argc, argv, file, help);CHKERRQ(ierr);
       PetscFunctionReturn(ierr);
     }
 

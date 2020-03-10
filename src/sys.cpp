@@ -21,5 +21,14 @@ namespace nlts
     PetscFunctionReturn(ierr);
   }
 
+  extern PetscErrorCode VecGetSubRange(Vec X, PetscInt start, PetscInt end, Vec *Y)
+  {
+    IS is;
+    PetscErrorCode ierr;
+    PetscFunctionBeginUser;
+    ierr = ISCreateStride(PETSC_COMM_WORLD, end - start, start, 1, &is);CHKERRQ(ierr);
+    ierr = VecGetSubVector(X, is, Y);CHKERRQ(ierr);
+    PetscFunctionReturn(ierr);
+  }
 
 }
