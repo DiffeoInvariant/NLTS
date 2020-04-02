@@ -7,13 +7,20 @@ include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables
 include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscrules
 
 NLTS_INCL=../include/
-INCLS=-I$(NLTS_INCL) -I/usr/include/boost $(PETSC_CC_INCLUDES) 
+ODEINT_INCL=/home/diffeoinvariant/odeint/include/
+
+INCLS=-I$(NLTS_INCL) -I$(ODEINT_INCL) -I/usr/include/boost -I../packages/GSL/include $(PETSC_CC_INCLUDES)
+
+
 
 TARGET_IO = test_io
 
-.PHONY: all io txt2petsc in diff embed
+.PHONY: all io txt2petsc in diff embed nndb test_bcd
 
-all: io txt2petsc in diff embed
+all: io txt2petsc in diff embed nndb test_bcd
+
+nndb: test_nndb.cpp
+	$(CXX) $(CXXFLAGS) $^ -o test_nndb $(INCLS) $(LDFLAGS)
 
 embed: test_embedding.cpp
 	$(CXX) $(CXXFLAGS) $^ -o test_embed $(INCLS) $(LDFLAGS)
@@ -28,5 +35,9 @@ txt2petsc: txt2petsc.cpp
 
 io: test_io.cpp
 	$(CXX) $(CXXFLAGS) $^ -o test_io $(INCLS) $(LDFLAGS)
+
+test_bcd: test_bcd.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@ $(INCLS) $(LDFLAGS)
+
 clean:
 	@$(RM) *.o
