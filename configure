@@ -9,7 +9,7 @@ Based on, and partly copied from, PETSc's configure.py
 PETSC_VERSION = '3.12.4'
 PETSC_DOWNLOAD_URL=f'http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-{PETSC_VERSION}.tar.gz'
 DEFAULT_PETSC_ARCH='arch-linux-c-nlts'
-DEFAULT_PETSC_DIR=f'packages/petsc-{PETSC_VERSION}'
+DEFAULT_PETSC_DIR=os.path.abspath(f'packages/petsc-{PETSC_VERSION}')
 def check_python_version():
     if sys.version_info < (2,6):
         print('************************************************************************')
@@ -28,15 +28,15 @@ def download_petsc():
     os.system('cd packages && tar -xzf petsc.tar.gz && rm -f petsc.tar.gz && cd -')
 
 def configure_and_build_petsc(CC, CXX):
-    config_str = f"./configure PETSC_ARCH={DEFAULT_PETSC_ARCH} --with-cc={CC} --with-cxx={CXX} --download-mpich --download-sowing  --download-zlib --download-libpng --download-fftw --with-fc=0 --download-f2cblaslapack COPTFLAGS='-O3 -march=native -mtune=native -fPIC' CXXOPTFLAGS='-O3 -march=native -mtune=native -fPIC' FOPTFLAGS='-O3 -g -march=native -mtune=native'"
+    config_str = f"./configure PETSC_ARCH={DEFAULT_PETSC_ARCH} --with-cc={CC} --with-cxx={CXX} --download-mpich --download-sowing  --download-zlib --download-libpng --download-fftw --with-fc=0 --download-f2cblaslapack --with-x COPTFLAGS='-O3 -march=native -mtune=native -fPIC' CXXOPTFLAGS='-O3 -march=native -mtune=native -fPIC' FOPTFLAGS='-O3 -g -march=native -mtune=native'"
 
     print(f"Configuring PETSc with options\n{config_str}")
     print(f"cd {DEFAULT_PETSC_DIR} && {config_str}")
     os.system(f"cd {DEFAULT_PETSC_DIR} && {config_str}")
-    print(f'make -C packages/petsc-{PETSC_VERSION} all')
-    os.system(f'make -C packages/petsc-{PETSC_VERSION} all')
-    print(f'make -C packages/petsc-{PETSC_VERSION} check')
-    os.system(f'make -C packages/petsc-{PETSC_VERSION} check')
+    print(f'make -C packages/petsc-{PETSC_VERSION} PETSC_DIR {DEFAULT_PETSC_DIR} PETSC_ARCH {DEFAULT_PETSC_ARCH} all')
+    os.system(f'make -C packages/petsc-{PETSC_VERSION} PETSC_DIR={DEFAULT_PETSC_DIR} PETSC_ARCH={DEFAULT_PETSC_ARCH} all')
+    print(f'make -C packages/petsc-{PETSC_VERSION} PETSC_DIR={DEFAULT_PETSC_DIR} PETSC_ARCH={DEFAULT_PETSC_ARCH} check')
+    os.system(f'make -C packages/petsc-{PETSC_VERSION} PETSC_DIR={DEFAULT_PETSC_DIR} PETSC_ARCH={DEFAULT_PETSC_ARCH} check')
     os.system('cd -')
                             
     
@@ -130,3 +130,9 @@ if __name__ == '__main__':
     handle_dependencies(options)
     makefile_lines = build_makefile_lines(options)
     write_makefile(makefile_lines)
+    print('''---------------------------------------
+             Now, to build NLTS, run
+
+             make
+---------------------------------------
+         ''')

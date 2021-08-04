@@ -7,7 +7,8 @@ git clone git@github.com:DiffeoInvariant/NLTS.git
 ```
 ## Dependencies
   You need working installations of PETSc (can be downloaded via `configure`) and boost. 
-  You can download PETSc from https://www.mcs.anl.gov/petsc/download/index.html, or have NLTS do it for you by passing the `--download_petsc` flag to `configure`.
+  You can download PETSc from https://www.mcs.anl.gov/petsc/download/index.html, or have NLTS do it for you by passing the `--download_petsc` flag to `configure`. For plotting to work (and to use the default PETSc downloaded and configured with `--download_petsc`) you will need X windows headers, which you can
+  install on ubuntu with `sudo apt install libx11-dev`, or on Arch with `pacman -S libx11-devel`.
   
 ## Configuration
   Run `./configure -h` to see configure options.
