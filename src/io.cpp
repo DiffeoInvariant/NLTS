@@ -1,8 +1,7 @@
 #include <nlts/io.h>
 #include <algorithm>
 #include <numeric>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 
 namespace nlts
 {
@@ -55,7 +54,7 @@ namespace nlts
       PetscErrorCode ierr;
       PetscViewer    viewer;
       std::string    xflname, tflname, ndname;
-      namespace bfs = boost::filesystem;
+      namespace bfs = std::filesystem;
 
       xflname = filename_pre + std::string{"_x.dat"};
       tflname = filename_pre + std::string{"_t.dat"};
