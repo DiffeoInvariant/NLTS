@@ -3,7 +3,7 @@
 int main(int argc, char **argv)
 {
   PetscErrorCode ierr;
-  Vec            t;
+  Vec            t, x;
 
    ierr = PetscInitialize(&argc, &argv, NULL, NULL);CHKERRQ(ierr);
 

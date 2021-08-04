@@ -28,10 +28,6 @@ namespace nlts
       std::vector<PetscInt> idx;
       MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
       MPI_Comm_size(PETSC_COMM_WORLD, &size);
-
-      if(size > 1 and rank){
-	PetscPrintf(PETSC_COMM_WORLD, "WARNING: creating vectors on multiple processes or on a non-root process! This is probably not gonna work.\n");
-      }
       
       auto [x, t] = read_scalar_trajectory(filename);
       idx.resize(x.size());

@@ -48,9 +48,6 @@ def build_options_and_downloads(options_pre="--with_", download_pre="--download_
     build_option(options_list, options_pre, "PETSC_DIR", "Directory with your PETSc installation.")
     build_option(options_list, options_pre, "PETSC_ARCH", "PETSC_ARCH for your PETSc installation.")
     build_option(download_list, download_pre, "petsc", "Download PETSc")
-    #build_option(options_list, options_pre, "boost_dir", "Directory for your Boost installation.")
-    #build_option(options_list, options_pre, "boost_lib_dir", "Directory of your boost/filesystem library.")
-    #build_option(download_list, download_pre, "boost", "Download Boost")
     build_option(options_list, options_pre, "cc", "Which C compiler to use? Default clang.")
     build_option(options_list, options_pre, "cxx", "Which C++ compiler to use? Default clang++. If you provide a different cxx, it MUST support the C++17 standard.")
     
