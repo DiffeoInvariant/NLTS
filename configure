@@ -106,7 +106,7 @@ def build_makefile_lines(options):
              "mutual: $(NLTS_PROGRAMS_DIR)/mutual.cpp\n",
              "\t$(CXX) $(CXXFLAGS) $^ -o bin/mutual $(INCLS) $(PETSC_WITH_EXTERNAL_LIB) -L./lib -lnlts -Wl,-rpath,$(shell pwd)/lib\n\n",
              "$(TARGET): $(NLTS_SRCS)\n",
-             "\tmkdir -p lib\n",
+             "\tmkdir -p bin lib\n",
              "\t$(CXX) $(CXXFLAGS) $^ -o $@ $(INCLS) $(LDFLAGS)\n\n",]
 
     return lines
