@@ -7,7 +7,7 @@ from urllib.request import urlretrieve
 Based on, and partly copied from, PETSc's configure.py
 '''
 PETSC_DOWNLOAD_URL='http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-3.12.4.tar.gz'
-DEFAULT_PETSC_ARCH='arch-libnlts-cxx-debug'
+DEFAULT_PETSC_ARCH='arch-linux-c-opt'
 DEFAULT_PETSC_DIR='packages/petsc'
 def check_python_version():
     if sys.version_info < (2,6):
@@ -43,8 +43,8 @@ def build_options_and_downloads(options_pre="--with_", download_pre="--download_
     build_option(options_list, options_pre, "PETSC_DIR", "Directory with your PETSc installation.")
     build_option(options_list, options_pre, "PETSC_ARCH", "PETSC_ARCH for your PETSc installation.")
     build_option(download_list, download_pre, "petsc", "Download PETSc")
-    build_option(options_list, options_pre, "boost_dir", "Directory for your Boost installation.")
-    build_option(options_list, options_pre, "boost_lib_dir", "Directory of your boost/filesystem library.")
+    #build_option(options_list, options_pre, "boost_dir", "Directory for your Boost installation.")
+    #build_option(options_list, options_pre, "boost_lib_dir", "Directory of your boost/filesystem library.")
     #build_option(download_list, download_pre, "boost", "Download Boost")
     build_option(options_list, options_pre, "cc", "Which C compiler to use? Default clang.")
     build_option(options_list, options_pre, "cxx", "Which C++ compiler to use? Default clang++. If you provide a different cxx, it MUST support the C++17 standard.")
@@ -72,8 +72,6 @@ def parse_arguments(parser):
 
     options = assign_if(options, args.with_PETSC_DIR, 'PETSC_DIR', DEFAULT_PETSC_DIR)
     options = assign_if(options, args.with_PETSC_ARCH, 'PETSC_ARCH', DEFAULT_PETSC_ARCH)
-    options = assign_if(options, args.with_boost_dir, 'boost_dir', '/usr/include/boost')
-    options = assign_if(options, args.with_boost_lib_dir, 'boost_lib', '/lib/x86_64-linux-gnu')
     options = assign_if(options, args.with_cc, 'CC', 'clang')
     options = assign_if(options, args.with_cxx, 'CXX', 'clang++')
     options['download_petsc'] = args.download_petsc
@@ -91,11 +89,11 @@ def build_makefile_lines(options):
              f"PETSC_ARCH={options['PETSC_ARCH']}\n",
              f"CXX={options['CXX']}\n",
              f"CXXFLAGS=-std=c++17 -O3 -march=native -mtune=native -fPIC -g\n",
-             f"LDFLAGS=-shared $(PETSC_WITH_EXTERNAL_LIB) -L{options['boost_lib']} -lboost_filesystem\n\n",
+             f"LDFLAGS=-shared $(PETSC_WITH_EXTERNAL_LIB) \n\n",
              "include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables\n",
              "include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscrules\n\n",
              "NLTS_INCL=include/\n",
-             f"INCLS=-I$(NLTS_INCL) -I{options['boost_dir']} -I./packages/GSL/include $(PETSC_CC_INCLUDES)\n",
+             f"INCLS=-I$(NLTS_INCL) -I./packages/GSL/include $(PETSC_CC_INCLUDES)\n",
              "NLTS_SRC_DIR=src/\n",
              "NLTS_SRCS:=$(shell find $(NLTS_SRC_DIR) -name '*.cpp')\n\n",
              "TARGET_DIR=lib\n",
@@ -104,13 +102,11 @@ def build_makefile_lines(options):
              ".PHONY: all $(TARGET) mutual mutual-opt\n\n",
              "all: $(TARGET) mutual mutual-opt\n\n",
              "mutual-opt:$(NLTS_PROGRAMS_DIR)/mutual_opt.cpp\n",
-             "\t$(CXX) $(CXXFLAGS) $^ -o bin/mutual-opt $(INCLS) $(PETSC_WITH_EXTERNAL_LIB) -L./lib -lnlts\n",
-             "\tLD_LIBRARY_PATH=lib\n\n",
+             "\t$(CXX) $(CXXFLAGS) $^ -o bin/mutual-opt $(INCLS) $(PETSC_WITH_EXTERNAL_LIB) -L./lib -lnlts -Wl,-rpath,$(shell pwd)/lib\n\n",
              "mutual: $(NLTS_PROGRAMS_DIR)/mutual.cpp\n",
-             "\t$(CXX) $(CXXFLAGS) $^ -o bin/mutual $(INCLS) $(PETSC_WITH_EXTERNAL_LIB) -L./lib -lnlts\n\n",
+             "\t$(CXX) $(CXXFLAGS) $^ -o bin/mutual $(INCLS) $(PETSC_WITH_EXTERNAL_LIB) -L./lib -lnlts -Wl,-rpath,$(shell pwd)/lib\n\n",
              "$(TARGET): $(NLTS_SRCS)\n",
-             "\t$(CXX) $(CXXFLAGS) $^ -o $@ $(INCLS) $(LDFLAGS)\n",
-             "\tLD_LIBRARY_PATH=lib\n\n"]
+             "\t$(CXX) $(CXXFLAGS) $^ -o $@ $(INCLS) $(LDFLAGS)\n",]
 
     return lines
 
