@@ -6,9 +6,10 @@ from urllib.request import urlretrieve
 '''
 Based on, and partly copied from, PETSc's configure.py
 '''
-PETSC_DOWNLOAD_URL='http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-3.12.4.tar.gz'
-DEFAULT_PETSC_ARCH='arch-linux-c-opt'
-DEFAULT_PETSC_DIR='packages/petsc'
+PETSC_VERSION = '3.12.4'
+PETSC_DOWNLOAD_URL=f'http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-{PETSC_VERSION}.tar.gz'
+DEFAULT_PETSC_ARCH='arch-linux-c-nlts'
+DEFAULT_PETSC_DIR=f'packages/petsc-{PETSC_VERSION}'
 def check_python_version():
     if sys.version_info < (2,6):
         print('************************************************************************')
@@ -20,18 +21,22 @@ def check_python_version():
 def download_petsc():
     print('************************************************************************')
     print('*              Attempting to download PETSc from                       *')
-    print('*http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-3.12.4.tar.gz *')
+    print(f'*http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-lite-{PETSC_VERSION}.tar.gz *')
     print('************************************************************************')
-    os.system('mkdir packages')
+    os.system('mkdir -p packages')
     petsc_tarball, headers = urlretrieve(PETSC_DOWNLOAD_URL, 'packages/petsc.tar.gz')
-    os.system('tar -xzf packages/petsc.tar.gz')
+    os.system('cd packages && tar -xzf petsc.tar.gz && rm -f petsc.tar.gz && cd -')
 
 def configure_and_build_petsc(CC, CXX):
-    config_str = f"./configure PETSC_ARCH={DEFAULT_PETSC_ARCH} --with-cc={CC} --with-cxx={CXX} --download-mpich --download-sowing --download-c2html --download-zlib --download-libpng --download-fftw --with-fc=0 COPTFLAGS='-O3 -march=native -mtune=native -fPIC' CXXOPTFLAGS='-O3 -march=native -mtune=native -fPIC'"
+    config_str = f"./configure PETSC_ARCH={DEFAULT_PETSC_ARCH} --with-cc={CC} --with-cxx={CXX} --download-mpich --download-sowing  --download-zlib --download-libpng --download-fftw --with-fc=0 --download-f2cblaslapack COPTFLAGS='-O3 -march=native -mtune=native -fPIC' CXXOPTFLAGS='-O3 -march=native -mtune=native -fPIC' FOPTFLAGS='-O3 -g -march=native -mtune=native'"
 
+    print(f"Configuring PETSc with options\n{config_str}")
+    print(f"cd {DEFAULT_PETSC_DIR} && {config_str}")
     os.system(f"cd {DEFAULT_PETSC_DIR} && {config_str}")
-    os.system('make PETSC_DIR={DEFAULT_PETSC_DIR} PETSC_ARCH={DEFAULT_PETSC_ARCH} all')
-    os.system('make PETSC_DIR={DEFAULT_PETSC_DIR} PETSC_ARCH={DEFAULT_PETSC_ARCH} check')
+    print(f'make -C packages/petsc-{PETSC_VERSION} all')
+    os.system(f'make -C packages/petsc-{PETSC_VERSION} all')
+    print(f'make -C packages/petsc-{PETSC_VERSION} check')
+    os.system(f'make -C packages/petsc-{PETSC_VERSION} check')
     os.system('cd -')
                             
     
@@ -90,6 +95,7 @@ def build_makefile_lines(options):
              f"CXX={options['CXX']}\n",
              f"CXXFLAGS=-std=c++17 -O3 -march=native -mtune=native -fPIC -g\n",
              f"LDFLAGS=-shared $(PETSC_WITH_EXTERNAL_LIB) \n\n",
+             "default: all\n",
              "include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables\n",
              "include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscrules\n\n",
              "NLTS_INCL=include/\n",

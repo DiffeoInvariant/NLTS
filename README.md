@@ -7,7 +7,7 @@ git clone git@github.com:DiffeoInvariant/NLTS.git
 ```
 ## Dependencies
   You need working installations of PETSc (can be downloaded via `configure`) and boost. 
-  You can download PETSc from https://www.mcs.anl.gov/petsc/download/index.html.
+  You can download PETSc from https://www.mcs.anl.gov/petsc/download/index.html, or have NLTS do it for you by passing the `--download_petsc` flag to `configure`.
   
 ## Configuration
   Run `./configure -h` to see configure options.
