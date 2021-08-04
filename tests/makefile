@@ -5,11 +5,9 @@ include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables
 include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscrules
 
 NLTS_INCL=../include/
-ODEINT_INCL=/home/diffeoinvariant/odeint/include/
+ODEINT_INCL=../packages/odeint/include/
 
-INCLS=-I$(NLTS_INCL) -I$(ODEINT_INCL) -I/usr/include/boost -I../packages/GSL/include $(PETSC_CC_INCLUDES)
-
-BOOST_LINK = -Wl,-rpath,../packages/boost_1_66_0/lib -L../packages/boost_1_66_0/lib -lboost_system -lboost_filesystem
+INCLS=-I$(NLTS_INCL) -I$(ODEINT_INCL) -I../packages/boost_1_66_0/include -I../packages/GSL/include $(PETSC_CC_INCLUDES)
 
 TARGET_IO = test_io
 
@@ -17,8 +15,6 @@ TARGET_IO = test_io
 
 all: io txt2petsc in diff embed nndb test_bcd
 
-nndb: test_nndb.cpp
-	$(CXX) $(CXXFLAGS) $^ -o test_nndb $(INCLS) $(LDFLAGS) 
 
 embed: test_embedding.cpp
 	$(CXX) $(CXXFLAGS) $^ -o test_embed $(INCLS) $(LDFLAGS) 
