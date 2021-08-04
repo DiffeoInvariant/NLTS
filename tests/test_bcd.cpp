@@ -16,11 +16,6 @@ State Lorenz63RHS(double t, const State& x, double a, double r, double b)
   return xprime;
 }
 
-double bcdim(int N, double eps)
-{
-  return std::log(static_cast<double>(N))/(std::log(1.0/eps));
-}
-
 int main()
 {
   namespace ph = std::placeholders;
@@ -50,7 +45,7 @@ int main()
       mem *= static_cast<mp::uint1024_t>(sizeof(int)*std::floor((bd.second - bd.first)/e));
     }
     memusage.push_back(mem);
-    bcd.push_back(bcdim(bctr.nonzeroBoxes(), e));
+    bcd.push_back(bctr.boxCountingDimension());
   }
 
   for(auto i=0; i<eps.size(); ++i){

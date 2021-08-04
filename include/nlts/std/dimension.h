@@ -23,7 +23,23 @@ namespace nlts
       return res;
     }
   };
-  
+
+  /* type param T: the type of the elements of points in your trajectory.
+     a trajectory is a vector of pairs of (point, time), where `point` is
+     an std::array<T, N> and `time` is a T. T should be arithmetic,
+     but this requirement is not currently expressed with std::enable_if<>
+     because the relative simplicity of the class makes diagnosing type errors
+     easier without it.
+
+     type param N: how many T's make u a point? N of them!
+
+     The BoxCounter<T, N> class takes a trajectory (as represented by
+     a BoxCounter<T, N>::Trajectory_t) and a box size of epsilon, partitions
+     the minimal N-box enclosing the entire trajectory into N-cubes of side
+     length epsilon, and counts how many boxes have at least one point in 
+     them.
+     
+    */
   template<typename T, std::size_t N>
   class BoxCounter
   {
@@ -37,14 +53,22 @@ namespace nlts
       count_nz_box();
     };
 
-    int nonzeroBoxes() const noexcept
+    /* how many boxes have at least one point in them? */
+    long nonzeroBoxes() const noexcept
     {
       return nnzbox;
     }
 
-    auto bounds() const noexcept
+    /* the bounds of the minimal N-box enclosing the points */
+    std::array<std::pair<T, T>,N> bounds() const noexcept
     {
       return min_max;
+    }
+
+    /* the box-counting dimension of the trajectory */
+    T boxCountingDimension() const
+    {
+      return -std::log(static_cast<double>(nnzbox)) / std::log(eps);
     }
     
 
@@ -54,7 +78,7 @@ namespace nlts
     Trajectory_t                   trajectory;
     T                              eps;
     std::unordered_map<Key_t, int, array_hash<long,N>> box_counts;
-    int                            nnzbox;
+    long                           nnzbox;
     std::array<std::pair<T, T>,N>  min_max;
 
     void compute_bounds()
