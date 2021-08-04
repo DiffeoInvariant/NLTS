@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/cpp_dec_float.hpp>
 using State = std::array<double, 3>;
 
 State Lorenz63RHS(double t, const State& x, double a, double r, double b)
@@ -53,8 +54,12 @@ int main()
   }
 
   for(auto i=0; i<eps.size(); ++i){
-    std::cout << "With epsilon=" << eps[i] << ", N(epsilon) = " << N[i] << ", and log(N(epsilon))/log(1/epsilon) = " << bcd[i] << ".\n";
-    std::cout << "If we had used the naive calculation, we would have used " << memusage[i] << " bytes of memory.\n";
+    std::cout << "With epsilon=" << eps[i] << ", N(epsilon) = "
+	      << N[i] << ", and log(N(epsilon))/log(1/epsilon) = "
+	      << bcd[i] << ".\n"
+	      << "If we had used the naive calculation, we would have used "
+	      << std::setprecision(5) << std::scientific
+	      << mp::cpp_dec_float_50(memusage[i]) / 1'000'000 << " MB of memory.\n";
   }
 
   return 0;
