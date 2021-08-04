@@ -97,7 +97,7 @@ namespace nlts
 
   
   PetscErrorCode FiniteDifference(Vec X, Vec dXdt, PetscReal dt, PetscInt order,
-				  StencilType direction, bool periodic_domain)
+				  StencilType direction)
   {
     PetscErrorCode ierr;
     PetscInt       i, nx, xs, xe, xps, xpe;
@@ -122,7 +122,7 @@ namespace nlts
       switch(direction){
       case Forward:
 	{
-	  if(i - xs < nx - order){
+	  if(i < nx - order){
 	    ierr = ForwardFd(x, dxdt, i - xs, dt, order);CHKERRQ(ierr);
 	  } else {
 	    /* near end of the array, use backward FD */

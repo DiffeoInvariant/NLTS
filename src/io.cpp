@@ -24,11 +24,7 @@ namespace nlts
 					   Vec *X, Vec *T)
     {
       PetscErrorCode ierr;
-      PetscMPIInt    rank, size;
-      std::vector<PetscInt> idx;
-      MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
-      MPI_Comm_size(PETSC_COMM_WORLD, &size);
-      
+      std::vector<PetscInt> idx;      
       auto [x, t] = read_scalar_trajectory(filename);
       idx.resize(x.size());
       std::iota(idx.begin(), idx.end(), 0);

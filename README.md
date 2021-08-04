@@ -15,8 +15,10 @@ git clone git@github.com:DiffeoInvariant/NLTS.git
   
 ## Building
 ```
-make all
+./configure <options>
+make
 ```
+where `<options>` are any options you want to pass to `configure`, which you can view by running `./configure -h`
 
 # TISEAN Programs
 NLTS contains several (currently, only one--`mutual`) implementations of programs included in the TISEAN library.

@@ -5,10 +5,11 @@
 #include <petscmath.h>
 #include <utility>
 #include <tuple>
-
+#include <iostream>
 int main(int argc, char **argv)
 {
   PetscErrorCode ierr;
+  PetscInt       rank, size;
   Vec            X, dsX, T, dsT, dXdT;
   PetscScalar    *x, xv;
   PetscReal      dt;
@@ -16,6 +17,8 @@ int main(int argc, char **argv)
   bool           do_ds;
 
   ierr = PetscInitialize(&argc, &argv, NULL, NULL);CHKERRQ(ierr);
+  MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+  MPI_Comm_size(PETSC_COMM_WORLD, &size);
   ierr = nlts::VecReadBinary("trajectory_data/data_t.dat", &T);CHKERRQ(ierr);
   ierr = nlts::VecReadBinary("trajectory_data/data_x.dat", &X);CHKERRQ(ierr);
 
@@ -24,6 +27,7 @@ int main(int argc, char **argv)
     std::tie(downsample, do_ds) = nlts::get_petsc_option<PetscInt>("--downsample-rate");
   }
   ierr = VecGetLocalSize(X, &nx);CHKERRQ(ierr);
+  std::cout << "Process " << rank << " of " << size << " owns " << nx << " elements of X.\n";
   ierr = VecGetArray(X, &x);CHKERRQ(ierr);
   for(i=0; i<nx; ++i){
     xv = PetscFmodReal(x[i], 2 * M_PI);

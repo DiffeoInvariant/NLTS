@@ -1,6 +1,6 @@
 
 default: all
-CXXFLAGS=-std=c++17 -O3 -march=native -mtune=native -g
+CXXFLAGS=-std=c++17 -O3 -march=native -mtune=native -g $(INCLS)
 LDFLAGS=$(PETSC_WITH_EXTERNAL_LIB) -Wl,-rpath,../lib -L../lib -lnlts
 include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscvariables
 include $(PETSC_DIR)/$(PETSC_ARCH)/lib/petsc/conf/petscrules
