@@ -10,11 +10,10 @@ ODEINT_INCL=../packages/odeint/include/
 
 INCLS=-I$(NLTS_INCL) -I$(ODEINT_INCL) -I../packages/boost_1_66_0/include -I../packages/GSL/include $(PETSC_CC_INCLUDES)
 
-TARGET_IO = test_io
 
 .PHONY: all txt2petsc io in diff embed nndb test_bcd
 
-all: txt2petsc io in diff embed nndb test_bcd
+all: txt2petsc diff embed test_bcd
 
 
 embed: test_embedding.cpp

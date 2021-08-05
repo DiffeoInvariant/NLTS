@@ -77,7 +77,7 @@ int main(int argc, char **argv)
   title += std::string{", k = "};
   title += std::to_string(k);
   title += std::string{"."};
-  embedder.plotEmbedding(j, k, title, "j", "k", 2500, 2500);
+  embedder.plotEmbedding(j, k, title, "j", "k", 1500, 1500);
   }
   PetscFinalize();
   return 0;

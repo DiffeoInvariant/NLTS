@@ -111,6 +111,13 @@ int main(int argc, char **argv)
 			  "Lag (tau)", "Mutual Information (Shannon Entropy)",
 			  2000,2000, std::nullopt, "mutual_info.png");CHKERRQ(ierr);
     ierr = VecDestroy(&H);
+  } else if (entropy) {
+    ierr = PetscPrintf(PETSC_COMM_WORLD, "Entropy vs lag:\n");CHKERRQ(ierr);
+    PetscInt i = 0;
+    for (const auto& h : *entropy) {
+      ierr = PetscPrintf(PETSC_COMM_WORLD, "Lag %D: entropy = %g nats\n", i, h);CHKERRQ(ierr);
+      ++i;
+    }
   }
 
   VecDestroy(&Tau);

@@ -154,11 +154,7 @@ namespace nlts
     } else {
       num_part = 16;
     }
-    if(max_tau){
-      taumax = *max_tau;
-    } else {
-      taumax = 20;
-    }
+    taumax = max_tau.value_or(20);
 
     ierr = VecGetLocalSize(X, &nx);
     ierr = RescaleData(X, nx, min, interval);
