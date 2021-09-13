@@ -22,7 +22,7 @@ make
 where `<options>` are any options you want to pass to `configure`, which you can view by running `./configure -h`
 
 # TISEAN Programs
-NLTS contains several (currently, only one--`mutual`) implementations of programs included in the [https://www.pks.mpg.de/tisean/](TISEAN) library.
+NLTS contains several (currently, only one--`mutual`) implementations of programs included in the [TISEAN](https://www.pks.mpg.de/tisean/) library.
 These can be found in `NLTS/bin` (implementations are contained in `examples`), and have very similar syntax to TISEAN programs. Pass the `-h` option to any of these programs
 to see help options.
 
